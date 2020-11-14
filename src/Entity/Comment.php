@@ -5,10 +5,42 @@ namespace App\Entity;
 use App\Repository\CommentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=CommentRepository::class)
+ * @ApiResource(
+ *  collectionOperations={"GET", "POST"},
+ *  itemOperations={"GET", "DELETE", 
+ *      "report"={
+ *          "method"="PUT",
+ *          "path"="/comments/{id}/report",
+ *          "controller"="App\Controller\ReportCommentController",
+ *          "openapi_context"={
+ *              "summary"="Report a comment"
+ *          }
+ *      },
+ *      "validReport"={
+ *          "method"="PUT",
+ *          "path"="/comments/{id}/validReport",
+ *          "controller"="App\Controller\ValidReportCommentController",
+ *          "openapi_context"={
+ *              "summary"="Validate a reported comment"
+ *          }
+ *      }
+ *  },
+ *  attributes={
+ *      "order"={"sentAt":"ASC"}
+ *  },
+ *  normalizationContext={
+ *      "groups"={"comments_read"}
+ *  }
+ * )
+ * @ApiFilter(SearchFilter::class, properties={"status"})
  */
 class Comment
 {
@@ -16,32 +48,38 @@ class Comment
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"comments_read", "answers_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"comments_read", "answers_read"})
      */
     private $message;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"comments_read", "answers_read"})
      */
     private $status;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"comments_read", "answers_read"})
      */
     private $sentAt;
 
     /**
      * @ORM\OneToMany(targetEntity=Answer::class, mappedBy="comment", orphanRemoval=true)
+     * @Groups({"comments_read"})
      */
     private $answers;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="comments")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"comments_read", "answers_read"})
      */
     private $user;
 

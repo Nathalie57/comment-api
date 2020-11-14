@@ -3,10 +3,39 @@
 namespace App\Entity;
 
 use App\Repository\AnswerRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=AnswerRepository::class)
+ * @ApiResource(
+ *  collectionOperations={"GET", "POST"},
+ *  itemOperations={"GET", "DELETE", 
+ *      "report"={
+ *          "method"="PUT",
+ *          "path"="/answers/{id}/report",
+ *          "controller"="App\Controller\ReportAnswerController",
+ *          "openapi_context"={
+ *              "summary"="Report an answer"
+ *          }
+ *      },
+ *      "validReport"={
+ *          "method"="PUT",
+ *          "path"="/answers/{id}/validReport",
+ *          "controller"="App\Controller\ValidReportAnswerController",
+ *          "openapi_context"={
+ *              "summary"="Validate a reported answer"
+ *          }
+ *      }
+ *  },
+ *  attributes={
+ *      "order"={"sentAt":"ASC"}
+ *  },
+ *  normalizationContext={
+ *      "groups"={"answers_read"}
+ *  }
+ * )
  */
 class Answer
 {
@@ -14,33 +43,39 @@ class Answer
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"answers_read", "comments_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"answers_read", "comments_read"})
      */
     private $message;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"answers_read", "comments_read"})
      */
     private $status;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"answers_read", "comments_read"})
      */
     private $sentAt;
 
     /**
      * @ORM\ManyToOne(targetEntity=Comment::class, inversedBy="answers")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"answers_read"})
      */
     private $comment;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="answers")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"answers_read", "comments_read"})
      */
     private $user;
 
