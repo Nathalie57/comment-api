@@ -13,7 +13,9 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @Gedmo\SoftDeleteable(fieldName="deletedAt")
  * @ApiResource(
  *  collectionOperations={"GET", "POST"},
- *  itemOperations={"GET", "DELETE", 
+ *  itemOperations={
+ *      "GET", 
+ *      "DELETE"={"security"="object.getUser() == user"},
  *      "report"={
  *          "method"="PUT",
  *          "path"="/answers/{id}/report",
