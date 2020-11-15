@@ -6,9 +6,11 @@ use App\Repository\AnswerRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass=AnswerRepository::class)
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt")
  * @ApiResource(
  *  collectionOperations={"GET", "POST"},
  *  itemOperations={"GET", "DELETE", 
@@ -79,6 +81,11 @@ class Answer
      */
     private $user;
 
+    /**
+     * @ORM\Column(name="deleted_at", type="datetime", nullable=true)
+     */
+    private $deletedAt;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -140,6 +147,18 @@ class Answer
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeInterface
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeInterface $deletedAt): self
+    {
+        $this->deletedAt = $deletedAt;
 
         return $this;
     }
