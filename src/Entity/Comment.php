@@ -11,9 +11,11 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass=CommentRepository::class)
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt")
  * @ApiResource(
  *  collectionOperations={"GET", "POST"},
  *  itemOperations={"GET", "DELETE", 
@@ -79,17 +81,23 @@ class Comment
     private $answers;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="comments")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="comments", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"comments_read", "answers_read"})
      */
     private $user;
+
+    /**
+     * @ORM\Column(name="deleted_at", type="datetime", nullable=true)
+     */
+    private $deletedAt;
 
     public function __construct()
     {
         $this->answers = new ArrayCollection();
     }
 
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -169,6 +177,18 @@ class Comment
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeInterface
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeInterface $deletedAt): self
+    {
+        $this->deletedAt = $deletedAt;
 
         return $this;
     }
