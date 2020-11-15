@@ -6,6 +6,7 @@ use App\Repository\CommentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
@@ -73,6 +74,7 @@ class Comment
     /**
      * @ORM\OneToMany(targetEntity=Answer::class, mappedBy="comment", orphanRemoval=true)
      * @Groups({"comments_read"})
+     * @ApiSubresource
      */
     private $answers;
 
